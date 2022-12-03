@@ -13,7 +13,7 @@ void imprimetabla(int *A){
 void frecuencias(int *A){
 	int n;
 	FILE *pArchivo;
-    pArchivo = fopen("nombre.png", "rb"); //se coloca el nombre de archivo y extensión
+    pArchivo = fopen("hola.txt", "rb"); //se coloca el nombre de archivo y extensiï¿½n
     if(pArchivo==NULL){
     	printf("\n ***** ERROR *****");
     }else{
