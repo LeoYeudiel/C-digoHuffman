@@ -1,3 +1,4 @@
-lectura.exe
-tab.exe
-resultado.txt
+*.exe
+*.out
+*.txt
+.vscode
