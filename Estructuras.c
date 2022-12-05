@@ -1,6 +1,7 @@
 #include"Estructuras.h"
 #include<stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 void imprimePar(Par p){
@@ -39,14 +40,14 @@ void arregloPares(Pares tablaFrecuencias){
     }
 }
 
-void frecuencias(char* archivo, Pares tablaFrecuencias){
+uc* frecuencias(char* archivo, Pares tablaFrecuencias, ll* tam){
     FILE* arch;
     uc* lectura;
-    ll tam = tamArch(archivo);
+    *tam = tamArch(archivo);
     ll i;
     int n;
     
-    lectura = (unsigned char*) malloc(sizeof(ll) * tam);
+    lectura = (unsigned char*) malloc(sizeof(ll) * (*tam));
     if(lectura==NULL){
         printf("No hay memoria disponible para el arreglo");
 		exit(1);
@@ -54,9 +55,9 @@ void frecuencias(char* archivo, Pares tablaFrecuencias){
 
     arch = fopen(archivo,"rb");
 
-    fread(lectura,tam,1,arch);
+    fread(lectura,(*tam),1,arch);
 
-    for(i=0; i<tam; i++){
+    for(i=0; i<(*tam); i++){
         n = lectura[i];
         
         if(tablaFrecuencias[n].repeticiones==-1){
@@ -68,6 +69,9 @@ void frecuencias(char* archivo, Pares tablaFrecuencias){
         }
     }
 
+    fclose(arch);
+
+    return lectura;
 }
 
 void quickSort(Pares A, int p, int r){
@@ -302,26 +306,134 @@ NODO construyeArbolHuffman(Pares datos, int n){
     return extraeMin(a);
 }
 
-void imprimeCodigos(NODO raiz, int *a, int superior){
+void imprimeCodigos(NODO raiz, int *a, int tope, Cadena *dic, int *max){
+    if(tope>(*max))    *max = tope;
+
     if(raiz->izquierdo){
-        a[superior] = 0;
-        imprimeCodigos(raiz->izquierdo, a, superior+1);
+        a[tope] = 0;
+        imprimeCodigos(raiz->izquierdo, a, tope+1,dic,max);
     }
 
     if(raiz->derecho){
-        a[superior] = 1;
-        imprimeCodigos(raiz->derecho, a, superior+1);
+        a[tope] = 1;
+        imprimeCodigos(raiz->derecho, a, tope+1,dic,max);
     }
 
     if(esHoja(raiz)){
-        printf("%c: ", raiz->info.valor);
-        imprimeArregloEnteros(a,superior);
+        printf("%lld\t", raiz->info.repeticiones);
+        imprimeBits(8,raiz->info.valor);
+        printf("\t");
+        printf("%d\t", raiz->info.valor);
+        imprimeArregloEnteros(a,tope);
+        arrToString(a,dic[raiz->info.valor].cad,tope);
     }
 }
 
-void codigosHufman(Pares datos, int n){
+void generaDiccionario(Pares datos, int n, Cadena *dic, int *max){
     NODO raiz = construyeArbolHuffman(datos,n);
-    int a[100], superior = 0;
+    int a[100], tope = 0;
 
-    imprimeCodigos(raiz,a,superior);
+    imprimeCodigos(raiz,a,tope,dic,max);
 }
+
+void arrToString(int *arr, char* s, int n){
+    int i=0;
+    int indice = 0;
+
+    for (i=0; i<n; i++){
+        indice += sprintf(&s[indice], "%d", arr[i]);
+    }
+
+}
+
+void generaCadHufman(char* cH, uc* lectura,Cadena *diccionario, ll tam){
+    ll i;
+
+    //printf("%ld",sizeof(cH)/sizeof(cH[0]));
+    
+    for(i=0; i<tam; i++){
+        //printf("%s",diccionario[lectura[i]].cad);
+        strcat(cH,diccionario[lectura[i]].cad);
+    }
+}
+
+byte * crearEstructura(int n){
+  byte * nvo;
+  nvo = (byte *) malloc(sizeof(byte)*n);
+  if(nvo == NULL){ 
+     printf ("No hay espacio en memoria");
+     exit(0);
+  }
+  return nvo;
+}
+
+int * crearDeci(int n){
+  int * nvo;
+  nvo = (int *) malloc(sizeof(int)*n);
+  if(nvo == NULL){ 
+     printf ("No hay espacio en memoria");
+     exit(0);
+  }
+  return nvo;
+}
+
+int convertorBinToDec(char byte[8]){
+    int val[8] = {128,64,32,16,8,4,2,1}, i, resul=0;
+    for(i = 0; i < 8; i++){
+        if(byte[i] == '1') resul += val[i];
+    }
+    return resul;
+}
+
+void archComp(char* bytes, char* ubicacion){
+    FILE *arch;
+    byte *cadenas, recolectar;
+    char nvaCadena[8] = "";
+    ll cantBytes, i, cantCero;
+    int *dec;
+
+    arch = fopen(ubicacion,"w");
+    if(arch == NULL){
+      printf("No se pudo abrir el archivo de compresion!\n");   
+      exit(1);             
+    } 
+
+    //Saca el número de bytes que hay en la cadena
+    cantBytes = (strlen(bytes)/8)+1;
+    
+    cadenas = crearEstructura (cantBytes + 1);
+    dec = crearDeci(cantBytes + 1);
+
+    //Va insertando los caracteres
+    for(i = 0; i < cantBytes; i++){
+        strncpy(nvaCadena, bytes + (i*8), 8);
+        strcpy(cadenas[i].bits, nvaCadena);
+    }
+
+    if(strlen(cadenas[cantBytes-1].bits) < 8){
+        cantCero = 8 - strlen(cadenas[cantBytes - 1].bits);
+        memset(nvaCadena, 0, 8);
+        strcat(nvaCadena, cadenas[cantBytes - 1].bits);
+        for(i = 8- cantCero ; i < 8; i++){
+        strcat(nvaCadena, "0");
+        }
+        strcpy(cadenas[cantBytes - 1].bits, nvaCadena);
+
+        sprintf(cadenas[cantBytes].bits, "%lld" ,cantCero);
+    }
+    
+    //Va insertando los caracteres
+    for(i = 0; i <= cantBytes; i++){
+        if(i < cantBytes){
+            dec[i] = convertorBinToDec(cadenas[i].bits);
+        }else{
+            dec[i] = cantCero;
+        }
+
+        fprintf(arch,"%c",dec[i]);
+    }
+
+    fclose(arch);
+}
+
+   

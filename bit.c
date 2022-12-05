@@ -8,15 +8,15 @@
 int main(void)
 {
 	int i,n_bits; //Auxiliares
-	unsigned char numero=0; //Variable de tipo char (byte)
+	unsigned char numero=4; //Variable de tipo char (byte)
 	unsigned char arreglo[125];
 	
 	//bit 0 del arreglo 999
-	a=999;
+	int a=999;
 	PONE_1(arreglo[a/8],a%8);
 
 	//Determinar la longitud de los bits a operar
-	printf("Número de bits\n");
+	printf("Nï¿½mero de bits\n");
 	n_bits=sizeof(numero)*8;
 	printf("%2d bits",n_bits);	
 	printf("\n");
@@ -25,7 +25,7 @@ int main(void)
 	printf("Valor de los bits\n");
 	for (i=n_bits-1; i>=0; i--)
 	printf("%d",CONSULTARBIT(numero,i));
-	printf("\t%u\n",numero);
+	printf("\t%c\n",numero);
 
 	//Modificar el valor de algunos bits
 	printf("Modificar el valor de los bits\n");

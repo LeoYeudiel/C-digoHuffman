@@ -34,9 +34,17 @@ struct arbol{
 typedef struct arbol Arbol;
 typedef struct arbol* ARBOL;
 
+typedef struct{
+    char cad[100];
+}Cadena;
+
+typedef struct {
+ char bits[8];
+}byte;
+
 void imprimeArregloEnteros(int a[], int n);
 ll tamArch(char* arch);
-void frecuencias(char* arch, Pares tablaFrecuencias);
+uc* frecuencias(char* arch, Pares tablaFrecuencias, ll* tam);
 void arregloPares(Pares tablaFrecuencias);
 void quickSort(Pares A, int p, int r);
 int pivot(Pares A, int p, int r);
@@ -55,7 +63,14 @@ NODO extraeMin(ARBOL a);
 void inserta(ARBOL ar, NODO n);
 void construye(ARBOL a);
 int esHoja(NODO raiz);
-ARBOL construyeArbolRep(Par datos[], int n); 
-NODO construyeArbolHuffman(Par datos[], int n);
-void imprimeCodigos(NODO raiz, int a[], int superior);
-void codigosHufman(Par datos[], int n);
+ARBOL construyeArbolRep(Pares datos, int n); 
+NODO construyeArbolHuffman(Pares datos, int n);
+void imprimeCodigos(NODO raiz, int a[], int superior, Cadena *dic, int *max);
+void generaDiccionario(Pares dato, int n, Cadena *dic, int *max);
+void arrToString(int *arr, char* s, int n);
+void generaCadHufman(char* cH, uc* lectura, Cadena *diccionario, ll tam);
+
+byte* crearEstructura (int);
+int* crearDeci (int);
+int convertorBinToDec (char [8]);
+void archComp(char* bytes, char* ubicacion);
