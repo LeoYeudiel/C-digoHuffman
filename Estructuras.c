@@ -3,6 +3,10 @@
 #include <stdlib.h>
 
 
+void imprimePar(Par p){
+    printf("%d %lld\n",p.valor, p.repeticiones);
+}
+
 void imprimeArregloEnteros(int a[], int n){
     int i;
     for(i=0; i<n; i++){
@@ -137,21 +141,19 @@ void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n){
     int i,valorTF,n_bits;
     uc num;
 
-    //printf("BIN\tRep\n");
-    printf("NumDec\tASCII\tBIN\tRep\n");
+    printf("BIN\tRep\n");
+    //printf("NumDec\tASCII\tBIN\tRep\n");
 
     for(i=0; i<n; i++){
         
-        if(tablaFrecuencias[i].repeticiones!=-1){
             valorTF = tablaFrecuencias[i].valor;
             num = valorTF;
             n_bits = sizeof(num)*8;
             
 
-            printf("%d\t%c\t",valorTF,valorTF);
+            //printf("%d\t%c\t",valorTF,valorTF);
             imprimeBits(n_bits,num);
             printf("\t%lld\n",tablaFrecuencias[i].repeticiones);
-        }
 
     }
 }
@@ -174,6 +176,8 @@ NODO nuevoNodo(Par datos){
     aux->info.repeticiones = datos.repeticiones;
     aux->info.valor = datos.valor;
 
+    //imprimePar(datos);
+
     return aux;
 }
 
@@ -187,6 +191,8 @@ ARBOL creaArbol(int capacidad){
     aux->tam = 0;
     aux->capacidad = capacidad;
     aux->nodos = (NODO*)malloc(aux->capacidad*sizeof(NODO));
+
+    //printf("%d\t%d\n",aux->tam,capacidad);
 
     return aux;
 }
@@ -202,11 +208,12 @@ void intercambioActualMin(ARBOL a, int indice){
     int izq = 2*indice+1;
     int derecha = 2*indice+2;
 
-    if(izq<a->tam && a->nodos[izq]->info.repeticiones < a->nodos[min]->info.repeticiones){
+    if( izq < a->tam && 
+        a->nodos[izq]->info.repeticiones < a->nodos[min]->info.repeticiones){
         min = izq;
     }
 
-    if(derecha < a->tam && a->nodos[izq]->info.repeticiones < a->nodos[min]->info.repeticiones){
+    if(derecha < a->tam && a->nodos[derecha]->info.repeticiones < a->nodos[min]->info.repeticiones){
         min = derecha;
     }
 
@@ -246,19 +253,21 @@ void construye(ARBOL a){
     int n = a->tam - 1;
     int i;
  
-    for (i = (n - 1) / 2; i >= 0; --i)
+    for (i = (n - 1) / 2; i >= 0; --i){
         intercambioActualMin(a, i);
+    }
+        
 }
 
 int esHoja(NODO raiz){
     return !(raiz->izquierdo) && !(raiz->derecho);
 }
 
-ARBOL construyeArbolRep(Par datos[], int n){
-    ARBOL ar = creaArbol(256);
+ARBOL construyeArbolRep(Pares datos, int n){
+    ARBOL ar = creaArbol(n);
     int i;
 
-    for(i=0; i<256; i++){
+    for(i=0; i<n; ++i){
         ar->nodos[i] = nuevoNodo(datos[i]);
     }
 
@@ -268,7 +277,7 @@ ARBOL construyeArbolRep(Par datos[], int n){
     return ar;
 }
 
-NODO construyeArbolHuffman(Par datos[], int n){
+NODO construyeArbolHuffman(Pares datos, int n){
     NODO izq;
     NODO der;
     NODO superior;
@@ -280,7 +289,7 @@ NODO construyeArbolHuffman(Par datos[], int n){
         der = extraeMin(a);
 
         Par p;
-        p.valor = n;
+        p.valor = 36;
         p.repeticiones = izq->info.repeticiones + der->info.repeticiones;
         superior = nuevoNodo(p);
 
@@ -293,10 +302,10 @@ NODO construyeArbolHuffman(Par datos[], int n){
     return extraeMin(a);
 }
 
-void imprimeCodigos(NODO raiz, int a[], int superior){
+void imprimeCodigos(NODO raiz, int *a, int superior){
     if(raiz->izquierdo){
         a[superior] = 0;
-        imprimeCodigos(raiz->derecho, a, superior+1);
+        imprimeCodigos(raiz->izquierdo, a, superior+1);
     }
 
     if(raiz->derecho){
@@ -310,7 +319,7 @@ void imprimeCodigos(NODO raiz, int a[], int superior){
     }
 }
 
-void codigosHufman(Par datos[], int n){
+void codigosHufman(Pares datos, int n){
     NODO raiz = construyeArbolHuffman(datos,n);
     int a[100], superior = 0;
 

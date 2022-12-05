@@ -4,7 +4,9 @@
 
 int main(){
     char nombre[] = "archLec/hola.txt";
+    //char nombre[] = "archLec/objetivo.png";
     Par tablaFrecuencias[256];
+    Pares tablaUtiles;
     int i,n;
 
     arregloPares(tablaFrecuencias);
@@ -12,11 +14,13 @@ int main(){
     quickSort(tablaFrecuencias,0,255);
 
     n = elementosTabla(tablaFrecuencias);
-    Par tFconUtiles[n];
-    tablaConUtiles(tablaFrecuencias,tFconUtiles,n);
-    //imprimeTablaFrecuencias(tFconUtiles,n);
+    tablaUtiles = (Pares)malloc(sizeof(Par)*n);
+    tablaConUtiles(tablaFrecuencias,tablaUtiles,n);
+    
+    //imprimeTablaFrecuencias(tablaFrecuencias,256);
+    //imprimeTablaFrecuencias(tablaUtiles,n);
 
-    codigosHufman(tFconUtiles,n);
+    codigosHufman(tablaUtiles,n);
     
 
     return 0;
