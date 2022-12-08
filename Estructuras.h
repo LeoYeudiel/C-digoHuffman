@@ -1,9 +1,24 @@
+//*****************************************************************
+//M. EN C. EDGARDO ADRIÁN FRANCO MARTÍNEZ 
+//Curso: Análisis y Diseño de Algoritmos
+//(C) Diciembre 2022
+//ESCOM-IPN
+//Equipo: LOS TOSTADOS
+//Definición para la codificación de Huffman
+//*****************************************************************
+
+//*****************************************************************
+//DEFINICION DE CONSTANTES DEL PROGRAMA
+//*****************************************************************
 #define PESOBIT(bpos) 1<<bpos
 #define CONSULTARBIT(var,bpos) (*(unsigned*)&var & PESOBIT(bpos))?1:0
 #define PONE_1(var,bpos) *(unsigned*)&var |= PESOBIT(bpos)
 #define PONE_0(var,bpos) *(unsigned*)&var &= ~(PESOBIT(bpos))
 #define CAMBIA(var,bpos) *(unsigned*)&var ^= PESOBIT(bpos)
 
+//********************************************************************************
+//DECLARACION DE ESTRUCTURAS Y TIPO DE DATOS
+//********************************************************************************
 typedef long long int ll;
 typedef unsigned char uc;
 
@@ -42,6 +57,9 @@ typedef struct {
  char bits[8];
 }byte;
 
+//*****************************************************************
+//DECLARACIÓN DE FUNCIONES
+//*****************************************************************
 void imprimeArregloEnteros(int a[], int n);
 ll tamArch(char* arch);
 uc* frecuencias(char* arch, Pares tablaFrecuencias, ll* tam);

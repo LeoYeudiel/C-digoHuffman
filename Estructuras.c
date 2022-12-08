@@ -1,3 +1,15 @@
+//*****************************************************************
+//M. EN C. EDGARDO ADRIÁN FRANCO MARTÍNEZ 
+//Curso: Análisis y Diseño de Algoritmos
+//(C) Diciembre 2022
+//ESCOM-IPN
+//Equipo: LOS TOSTADOS
+//Funciones/Operaciones de para la codificación de Huffman
+//*****************************************************************
+
+//*****************************************************************
+//LIBRERIAS INCLUIDAS
+//*****************************************************************
 #include"Estructuras.h"
 #include<stdio.h>
 #include <stdlib.h>
@@ -17,7 +29,17 @@ void imprimeArregloEnteros(int a[], int n){
     printf("\n");
 }
 
+/*
+  Función que saca el tamaño del archivo
+	--------------------------------------
+	Argumentos:
+	char *arch: contiene la ruta del archivo a analizar 
+	Variables utilizadas:
+	FILE *archivo: tipo de dato para abrir el archivo y extraer la información
+  *return* ll res: devuelve la posición del puntero del archivo (tamaño del archivo)
+*/
 ll tamArch(char* arch){
+    //Abrimos el archivo en modo lectura
     FILE* archivo = fopen(arch,"r");
 
     if(archivo==NULL){
@@ -25,13 +47,29 @@ ll tamArch(char* arch){
         return -1;
     }
 
+    /*Recorre el puntero de lectura del archivo de inicio a fin
+    Agrumentos:
+    - archivo: archivo de análisis
+    - inicio de la posición
+    - SEEK_END constante para señalar el final del archivo
+    */
     fseek(archivo,0L,SEEK_END);
+    //Devuelve la posición en la que se encuentra el archivo, que será el tamaño del contenido del archivo
     ll res = ftell(archivo);
+    //Cerramos el archivo
     fclose(archivo);
 
     return res;
 }
 
+/*
+  Proceso para inicializar todo nuestro diccionario con el valor de -1 
+	--------------------------------------------------------------------
+	Argumentos:
+	Pares tablaFrecuencias: estructura que guarda información (carácter/elemento y el no. repeticiones del mismo elemento) 
+	Variables utilizadas:
+	int i: utilizada para el loop
+*/
 void arregloPares(Pares tablaFrecuencias){
     int i;
 
@@ -40,26 +78,53 @@ void arregloPares(Pares tablaFrecuencias){
     }
 }
 
+/*
+  Función para sacar la tabla de frecuencias, el tamaño de elementos a comprimir y la obtención del contenido del archivo
+	--------------------------------------------------------------------
+	Argumentos:
+	char * archivo: contiene la ruta del archivo a comprimir
+  Pares tablaFrecuencias: nuestro diccionario para guardar los elementos y la cantidad de repeticiones del mismo
+  ll *tam: guarda el tamaño de bytes del archivo
+	Variables utilizadas:
+	FILE *arch: tipo de dato para abrir el archivo y extraer la información
+  *return* uc* lectura: devuelve el contenido extraído del archivo
+  ll i: utilizada para el loop
+  int n: para identificar el byte que es.
+*/
 uc* frecuencias(char* archivo, Pares tablaFrecuencias, ll* tam){
+    //Declaración de funciones
     FILE* arch;
     uc* lectura;
-    *tam = tamArch(archivo);
     ll i;
     int n;
+
+    //Sacamos el tamaño del archivo
+    *tam = tamArch(archivo);
     
+    //Asignamos la memoria para poder guardar los elementos del archivo
     lectura = (unsigned char*) malloc(sizeof(ll) * (*tam));
     if(lectura==NULL){
         printf("No hay memoria disponible para el arreglo");
 		exit(1);
     }
 
+    //Abrimos el archivo en modo lectura binaria
     arch = fopen(archivo,"rb");
 
+    /*Recoge toda la información del archivo
+    Argumentos:
+    - lectura: variable en la que se va a guardar el archivo
+    - *tam: valor que contiene el tamaño del archivo, por lo tanto el contenido a leer
+    - arch: archivo a leer
+    */
     fread(lectura,(*tam),1,arch);
 
+    //Recorre todo el contenido obtenido y va registrando las repeticiones en nuestro diccionario de elementos
     for(i=0; i<(*tam); i++){
+        //Ve el byte que es
         n = lectura[i];
         
+        //Si no hay registro del elemento, registra el valor e incializa la repetición como 1, en caso de que haya registro va incrementando el no. de repeticiones
         if(tablaFrecuencias[n].repeticiones==-1){
             tablaFrecuencias[n].repeticiones = 1;
             tablaFrecuencias[n].valor = n;
@@ -69,11 +134,22 @@ uc* frecuencias(char* archivo, Pares tablaFrecuencias, ll* tam){
         }
     }
 
+    //Cerramos el archivo
     fclose(arch);
 
     return lectura;
 }
 
+/*
+	Algoritmo de ordenamiento "quickSort" (Función recursiva que se encarga de dividir el arreglo con ayuda del pivotes para ir ordenando)
+	------------------------------------------
+	Argumentos:
+	Pares A, estructura para ordenar conforme a las repeticiones
+	int p, posición inicial del arreglo
+	int r, posición final del arreglo/tamaño del arreglo
+	Variables utilizadas:
+	int j, posición del pivote asignado
+*/
 void quickSort(Pares A, int p, int r){
 	int j; //La variable será la parte intermediaria del arreglo
 	if(p < r){
@@ -84,6 +160,18 @@ void quickSort(Pares A, int p, int r){
 	}
 }
 
+/*
+	Algoritmo de ordenamiento "quickSort" (Función que asigna el pivote e intercambia la posición de manera que en el lado izquierdo esten los números menores y en el lado derecho esten los número mayores al pivote)
+	------------------------------------------
+	Argumentos:
+	Pares A, estructura para ordenar conforme a las repeticiones
+	int p, posición inicial del arreglo
+	int r, posición final del arreglo/tamaño del arreglo
+	Variables utilizadas:
+	ll piv, valor del pivote asignado en la posición incial
+	int i, variable auxiliar asignada en la posición inicial
+	*return* int j, variable auxiliar asignada en la posición final y será retornada como la posición que retoma el pivote
+*/
 int pivot(Pares A, int p, int r){
 	//Declaramos el pivote desde el inicio
 	ll piv = A[p].repeticiones;
@@ -109,17 +197,38 @@ int pivot(Pares A, int p, int r){
 	return j;
 }
 
+/*
+	Algoritmo de ordenamiento "quickSort" (Función que sólo realiza el intercambio de números)
+	------------------------------------------
+	Argumentos:
+	Pares A, estructura conforme a las repeticiones a ordenar
+	int i, posición 1 a intercambiar
+	int j, posición 2 a intercambiar
+	Variables utilizadas:
+	int temp, variable auxiliar para poder intercambiar el valor sin que se pierda su valor
+*/
 void intercambiar(Pares A, int i, int j){
 	Par temp = A[j];
 	A[j] = A[i];
 	A[i] = temp;
 }
 
+/*
+  Verifica cuantos bytes fueron encontrados en el archivo
+	-----------------------------------------------------------
+	Argumentos:
+	Pares A: estructura que referencia al diccionario de elementos extraídos del archivo
+	Variables utilizadas:
+	*return* int res: devuelve la variable que guarda la cantidad de bytes identificados en el archivo
+  int i: utilizada para el loop
+*/
 int elementosTabla(Pares tablaFrecuencias){
     int res=0;
     int i;
 
+    //Recorre el diccionario
     for(i=0; i<256; i++){
+        //En caso de que el número de repeticiones sea mayor a 0 suma el contador
         if(tablaFrecuencias[i].repeticiones>0){
             res++;
         }
