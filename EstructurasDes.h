@@ -1,0 +1,24 @@
+#define PESOBIT(bpos) 1<<bpos
+#define CONSULTARBIT(var,bpos) (*(unsigned*)&var & PESOBIT(bpos))?1:0
+#define PONE_1(var,bpos) *(unsigned*)&var |= PESOBIT(bpos)
+#define PONE_0(var,bpos) *(unsigned*)&var &= ~(PESOBIT(bpos))
+#define CAMBIA(var,bpos) *(unsigned*)&var ^= PESOBIT(bpos)
+
+typedef long long int ll;
+typedef unsigned char uc;
+
+struct nodo{
+    struct nodo* izq;
+    struct nodo* der;
+    int esHoja;
+    int simbolo;
+};
+
+typedef struct nodo Nodo;
+typedef struct nodo* NODO;
+
+NODO creaNodo();
+void construyeArbol(char* dirDiccionario, NODO raiz);
+ll tamArch(char* arch);
+char *cadCompresion eliminarBitBasura(char* dirCompresion);
+//void descompresion(char* cadCompresion, char* dirSalida, char* extension,NODO n);
