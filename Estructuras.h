@@ -7,6 +7,7 @@
 //Definición para la codificación de Huffman
 //*****************************************************************
 
+#include <stdio.h>
 //*****************************************************************
 //DEFINICION DE CONSTANTES DEL PROGRAMA
 //*****************************************************************
@@ -60,7 +61,7 @@ typedef struct {
 //*****************************************************************
 //DECLARACIÓN DE FUNCIONES
 //*****************************************************************
-void imprimeArregloEnteros(int a[], int n);
+void imprimeArregloEnteros(int a[], int n, FILE *);
 ll tamArch(char* arch);
 uc* frecuencias(char* arch, Pares tablaFrecuencias, ll* tam);
 void arregloPares(Pares tablaFrecuencias);
@@ -70,7 +71,7 @@ void intercambiar(Pares A, int i, int j);
 int elementosTabla(Pares tablaFrecuencias);
 void tablaConUtiles(Pares tablaFrecuencias, Pares nuevaTabla, int n);
 void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n);
-void imprimeBits(int n_bits, uc numero);
+void imprimeBits(int n_bits, uc numero, FILE *);
 
 NODO nuevoNodo(Par datos);
 ARBOL creaArbol(int capacidad);
@@ -83,8 +84,8 @@ void construye(ARBOL a);
 int esHoja(NODO raiz);
 ARBOL construyeArbolRep(Pares datos, int n); 
 NODO construyeArbolHuffman(Pares datos, int n);
-void imprimeCodigos(NODO raiz, int a[], int superior, Cadena *dic, int *max);
-void generaDiccionario(Pares dato, int n, Cadena *dic, int *max);
+void imprimeCodigos(NODO raiz, int a[], int superior, Cadena *dic, int *max, FILE *);
+void generaDiccionario(Pares dato, int n, Cadena *dic, int *max, char *);
 void arrToString(int *arr, char* s, int n);
 void generaCadHufman(char* cH, uc* lectura, Cadena *diccionario, ll tam);
 

@@ -29,6 +29,7 @@ int main(int argc, char * argv[]){
     double utime0, stime0, wtime0,utime1, stime1, wtime1; //Variables para medición de tiempos
     //char nombre[] = "archLec/objetivo.png";
     char compresion[] = "salidas/compresion.dat"; //Variable del nombre del archivo para poder guardar el archivo comprimido
+    char docFrecuencias[] = "salidas/frecuencias.txt";
     ll tamArchivo;
     uc* lectura;
     Par tablaFrecuencias[256];
@@ -69,7 +70,7 @@ int main(int argc, char * argv[]){
     //imprimeTablaFrecuencias(tablaFrecuencias,256);
     //imprimeTablaFrecuencias(tablaUtiles,n);
 
-    generaDiccionario(tablaUtiles,n,diccionarioHuffman,&longMaxima);
+    generaDiccionario(tablaUtiles,n,diccionarioHuffman,&longMaxima, docFrecuencias);
     cadenaHufman = (char*)malloc(sizeof(char)*longMaxima*tamArchivo);
     generaCadHufman(cadenaHufman,lectura,diccionarioHuffman,tamArchivo);
     //printf("%s\n",cadenaHufman);

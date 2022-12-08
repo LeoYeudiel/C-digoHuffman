@@ -20,13 +20,14 @@ void imprimePar(Par p){
     printf("%d %lld\n",p.valor, p.repeticiones);
 }
 
-void imprimeArregloEnteros(int a[], int n){
+void imprimeArregloEnteros(int a[], int n, FILE *arch){
     int i;
     for(i=0; i<n; i++){
-        printf("%d",a[i]);
+        if(arch == NULL) printf("%d",a[i]);
+        else fprintf(arch,"%d",a[i]);
     }
 
-    printf("\n");
+    fprintf(arch, "\n");
 }
 
 /*
@@ -265,17 +266,18 @@ void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n){
             
 
             //printf("%d\t%c\t",valorTF,valorTF);
-            imprimeBits(n_bits,num);
+            imprimeBits(n_bits,num, NULL);
             printf("\t%lld\n",tablaFrecuencias[i].repeticiones);
 
     }
 }
 
-void imprimeBits(int n_bits, uc numero){
+void imprimeBits(int n_bits, uc numero, FILE *arch){
     int i;
 
     for (i=n_bits-1; i>=0; i--)
-	printf("%d",CONSULTARBIT(numero,i));
+    	if(arch == NULL) printf("%d",CONSULTARBIT(numero,i));
+    	else fprintf(arch ,"%d",CONSULTARBIT(numero,i));
 }
 
 NODO nuevoNodo(Par datos){
@@ -415,34 +417,35 @@ NODO construyeArbolHuffman(Pares datos, int n){
     return extraeMin(a);
 }
 
-void imprimeCodigos(NODO raiz, int *a, int tope, Cadena *dic, int *max){
+void imprimeCodigos(NODO raiz, int *a, int tope, Cadena *dic, int *max, FILE *nombreArch){
     if(tope>(*max))    *max = tope;
 
     if(raiz->izquierdo){
         a[tope] = 0;
-        imprimeCodigos(raiz->izquierdo, a, tope+1,dic,max);
+        imprimeCodigos(raiz->izquierdo, a, tope+1,dic,max, nombreArch);
     }
 
     if(raiz->derecho){
         a[tope] = 1;
-        imprimeCodigos(raiz->derecho, a, tope+1,dic,max);
+        imprimeCodigos(raiz->derecho, a, tope+1,dic,max, nombreArch);
     }
 
     if(esHoja(raiz)){
-        printf("%lld\t", raiz->info.repeticiones);
-        imprimeBits(8,raiz->info.valor);
-        printf("\t");
-        printf("%d\t", raiz->info.valor);
-        imprimeArregloEnteros(a,tope);
+        fprintf(nombreArch,"%lld\t", raiz->info.repeticiones);
+        imprimeBits(8,raiz->info.valor, nombreArch);
+        fprintf(nombreArch,"\t");
+        fprintf(nombreArch, "%d\t", raiz->info.valor);
+        imprimeArregloEnteros(a,tope, nombreArch);
         arrToString(a,dic[raiz->info.valor].cad,tope);
     }
 }
 
-void generaDiccionario(Pares datos, int n, Cadena *dic, int *max){
+void generaDiccionario(Pares datos, int n, Cadena *dic, int *max, char *nombreArch){
     NODO raiz = construyeArbolHuffman(datos,n);
     int a[100], tope = 0;
-
-    imprimeCodigos(raiz,a,tope,dic,max);
+    FILE *arch = fopen(nombreArch, "w");
+    imprimeCodigos(raiz,a,tope,dic,max, arch);
+    fclose(arch);
 }
 
 void arrToString(int *arr, char* s, int n){
@@ -495,13 +498,13 @@ int convertorBinToDec(char byte[8]){
 }
 
 void archComp(char* bytes, char* ubicacion){
-    FILE *arch;
+    
     byte *cadenas, recolectar;
     char nvaCadena[8] = "";
     ll cantBytes, i, cantCero;
     int *dec;
 
-    arch = fopen(ubicacion,"w");
+    FILE *arch = fopen(ubicacion,"w");
     if(arch == NULL){
       printf("No se pudo abrir el archivo de compresion!\n");   
       exit(1);             
