@@ -238,6 +238,13 @@ int elementosTabla(Pares tablaFrecuencias){
     return res;
 }
 
+/*
+  Pasa en la nueva la información encontrada en el archivo
+  --------------------------------------------------------
+  Argumentos:
+  Pares tablaFrecuencias: estructura que trae la posibilidad de tener valores nulos y la encontrada en el archivo
+  Pares nuevaTabla: estructura en donde sólo se guardará la información encontrada en el archivo
+*/
 void tablaConUtiles(Pares tablaFrecuencias, Pares nuevaTabla, int n){
     int aux=0;
     int i;
@@ -248,8 +255,8 @@ void tablaConUtiles(Pares tablaFrecuencias, Pares nuevaTabla, int n){
             aux++;
         }
     }
-
 }
+
 
 void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n){
     int i,valorTF,n_bits;
@@ -280,14 +287,24 @@ void imprimeBits(int n_bits, uc numero, FILE *arch){
     	else fprintf(arch ,"%d",CONSULTARBIT(numero,i));
 }
 
+/*
+	Creación de un nodo metiendo el contenido del elemento (Estructura Par)
+	----------------------------
+	Argumentos:
+	Par datos: estructura que contiene el elemento y el no de repeticiones
+	Variables utilizadas:
+	*return* NODO aux: devolverá el nodo que contendrá la información de un elemento
+*/
 NODO nuevoNodo(Par datos){
+    //Asignamos memoria
     NODO aux = (NODO)malloc(sizeof(Nodo));
     if(aux == NULL){
         printf("No se ha creado el nodo\n");
         exit(0);
     }
-
+    //Inicializamos variables donde sus ramas serán NULL
     aux->izquierdo = aux->derecho = NULL;
+    //Se mete la información de la estructura Par
     aux->info.repeticiones = datos.repeticiones;
     aux->info.valor = datos.valor;
 
@@ -296,15 +313,27 @@ NODO nuevoNodo(Par datos){
     return aux;
 }
 
+/*
+	Creación de estructura árbol
+	----------------------------
+	Argumentos:
+	int capacidad: el número de elementos diferentes extraídos del archivo y así crear un número de nodos a utilizar para después realizar su barrido
+	Variables utilizadas:
+	*return* ARBOL aux: devolverá el una estructura ARBOL inicial, con el número de nodos a utilizar que será igual al número de elementos diferentes a analizar
+*/
 ARBOL creaArbol(int capacidad){
+    //Creamos el ARBOL padre
     ARBOL aux = (ARBOL)malloc(sizeof(Arbol));
     if(aux == NULL){
         printf("No se ha creado el arbol\n");
         exit(0);
     }
 
+    //Instanciamos valores iniciales
     aux->tam = 0;
+    //Número de elementos a analizar
     aux->capacidad = capacidad;
+    //Se crea los n nodos necesarios para poder analizar
     aux->nodos = (NODO*)malloc(aux->capacidad*sizeof(NODO));
 
     //printf("%d\t%d\n",aux->tam,capacidad);
@@ -378,20 +407,33 @@ int esHoja(NODO raiz){
     return !(raiz->izquierdo) && !(raiz->derecho);
 }
 
+/*
+	Creación de estructura árbol
+	----------------------------
+	Argumentos:
+	int capacidad: el número de elementos diferentes extraídos del archivo y así crear un número de nodos a utilizar para después realizar su barrido
+	Variables utilizadas:
+	*return* ARBOL aux: devolverá el una estructura ARBOL inicial, con el número de nodos a utilizar que será igual al número de elementos diferentes a analizar
+*/
 ARBOL construyeArbolRep(Pares datos, int n){
+    //Creamos el ARBOL padre inicial que contendrá los n nodos a analizar
     ARBOL ar = creaArbol(n);
     int i;
 
+    //Voy llenando de información al ARBOL obtenida de la estructura Par
     for(i=0; i<n; ++i){
         ar->nodos[i] = nuevoNodo(datos[i]);
     }
-
+    
     ar->tam = n;
     construye(ar);
 
     return ar;
 }
 
+/*
+
+*/
 NODO construyeArbolHuffman(Pares datos, int n){
     NODO izq;
     NODO der;
@@ -440,7 +482,19 @@ void imprimeCodigos(NODO raiz, int *a, int tope, Cadena *dic, int *max, FILE *no
     }
 }
 
+/*
+
+  -----------------------------------------------------------
+  Argumentos:
+  Pares datos: estructura que contiene la información extraída del archivo
+  int n: referencia el tamaño de elementos encontrados en el archivo
+  Cadena *dic:
+  Variables utilizadas:
+  *return* int res: devuelve la variable que guarda la cantidad de bytes identificados en el archivo
+  int i: utilizada para el loop
+*/
 void generaDiccionario(Pares datos, int n, Cadena *dic, int *max, char *nombreArch){
+
     NODO raiz = construyeArbolHuffman(datos,n);
     int a[100], tope = 0;
     FILE *arch = fopen(nombreArch, "w");

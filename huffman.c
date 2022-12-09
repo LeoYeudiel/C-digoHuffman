@@ -64,7 +64,9 @@ int main(int argc, char * argv[]){
 
     //Obtenemos el tamaño de bytes identificados en el archivo
     n = elementosTabla(tablaFrecuencias);
+    //Creamos una nueva estructura que contendrá la información jugosa
     tablaUtiles = (Pares)malloc(sizeof(Par)*n);
+    //Pasamos sólo los elementos verificados a nuestra nueva estructura
     tablaConUtiles(tablaFrecuencias,tablaUtiles,n);
     
     //imprimeTablaFrecuencias(tablaFrecuencias,256);
