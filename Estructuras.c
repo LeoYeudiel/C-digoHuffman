@@ -14,6 +14,7 @@
 #include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 
 void imprimePar(Par p){
@@ -512,6 +513,7 @@ void arrToString(int *arr, char* s, int n){
 
 }
 
+/*
 char* concatena(char *destino, size_t tam, Cadena* cadenas, size_t cantCad){
     assert(tam>0);
     
@@ -536,16 +538,44 @@ char* concatena(char *destino, size_t tam, Cadena* cadenas, size_t cantCad){
 
     return destino;
 }
+*/
+
+void concatena(char *destino, size_t tam, uc* lectura, Cadena* diccionario, size_t cantCad){
+    assert(tam>0);
+    
+    tam--;
+    char *p = destino;
+    int i=0;
+
+
+    while(cantCad-- > 0){
+        size_t len = strlen(diccionario[lectura[i]].cad);
+        //printf("%s\n",diccionario[lectura[i]].cad);
+        //printf("El tam es: %ld\n",len);
+        if(len>=tam){
+            len = tam;
+        }
+        tam-=len;
+        memcpy(p,diccionario[lectura[i]].cad,len);
+        lectura++;
+        p+=len;
+    }
+
+    *p = '\0';
+}
 
 void generaCadHufman(char* cH, uc* lectura,Cadena *diccionario, ll tam){
     ll i;
 
     //printf("%ld",sizeof(cH)/sizeof(cH[0]));
     
+    concatena(cH,sizeof cH, lectura,diccionario,tam);
+    
+    /*
     for(i=0; i<tam; i++){
-        //printf("%s",diccionario[lectura[i]].cad);
+        printf("%s\n",diccionario[lectura[i]].cad);
         strcat(cH,diccionario[lectura[i]].cad);
-    }
+    }*/
 }
 
 byte * crearEstructura(int n){

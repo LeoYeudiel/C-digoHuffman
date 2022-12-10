@@ -72,7 +72,8 @@ int elementosTabla(Pares tablaFrecuencias);
 void tablaConUtiles(Pares tablaFrecuencias, Pares nuevaTabla, int n);
 void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n);
 void imprimeBits(int n_bits, uc numero, FILE *);
-char* concatena(char *destino, size_t tam, Cadena* cadenas, size_t cantCad);
+//char* concatena(char *destino, size_t tam, Cadena* cadenas, size_t cantCad);
+void concatena(char *destino, size_t tam, uc* lectura, Cadena* diccionario, size_t cantCad);
 
 NODO nuevoNodo(Par datos);
 ARBOL creaArbol(int capacidad);
