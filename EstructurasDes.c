@@ -55,6 +55,43 @@ void construyeArbol(char* dirDiccionario, NODO raiz){
 
 }
 
+void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
+    char c = 0;
+    FILE *archComprimido;
+    FILE *archDescomprimido;
+    NODO aux = arbol;
+
+    archComprimido = fopen(dirCompresion,"r");
+    archDescomprimido = fopen(dirDescompresion,"w");
+
+    if(archComprimido == NULL || archDescomprimido == NULL){
+        printf("No se han podido abrir los archivo\n");
+        return;
+    }
+
+    while(!feof(archComprimido)){
+        c = getc(archComprimido);
+        if(c==EOF)
+            break;
+        if(c=='0')
+            aux = aux->izq;
+        else if(c=='1')
+            aux = aux->der;
+        else{
+            printf("Se ha leido un caracter no esperado\n");
+            return;
+        }
+
+        if(aux->esHoja){
+            fprintf(archDescomprimido,"%c",aux->simbolo);
+            aux = arbol;
+        }
+    }
+
+    fclose(archComprimido);
+    fclose(archDescomprimido);
+}
+
 ll tamArch(char* arch){
     FILE* archivo = fopen(arch,"r");
 
@@ -68,13 +105,4 @@ ll tamArch(char* arch){
     fclose(archivo);
 
     return res;
-}
-
-
-char *cadCompresion eliminarBitBasura(char* dirCompresion){
-    char* res;
-    FILE* arch;
-    ll tam = tamArch(dirCompresion);
-
-    
 }

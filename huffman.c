@@ -73,6 +73,7 @@ int main(int argc, char * argv[]){
     //imprimeTablaFrecuencias(tablaUtiles,n);
 
     generaDiccionario(tablaUtiles,n,diccionarioHuffman,&longMaxima, docFrecuencias);
+    printf("\n");
     cadenaHufman = (char*)malloc(sizeof(char)*longMaxima*tamArchivo);
     generaCadHufman(cadenaHufman,lectura,diccionarioHuffman,tamArchivo);
     //printf("%s\n",cadenaHufman);

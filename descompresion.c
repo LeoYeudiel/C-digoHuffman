@@ -5,11 +5,13 @@
 
 int main(){
     char diccionario[] = "salidas/frecuencias.txt";
-    char dirCompresion[] = "salidas/compresion.dat";
+    char dirCompresion[] = "salidas/temp.txt";
+    char dirDescompresion[] = "salidas/descompresion.txt";
     char* cadComp;
 
     NODO arbol = creaNodo();
     construyeArbol(diccionario,arbol);
-    cadComp = eliminarBitBasura(dirCompresion);
+
+    descompresion(dirCompresion,dirDescompresion,arbol);
 
 }
