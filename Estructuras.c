@@ -512,6 +512,31 @@ void arrToString(int *arr, char* s, int n){
 
 }
 
+char* concatena(char *destino, size_t tam, Cadena* cadenas, size_t cantCad){
+    assert(tam>0);
+    
+    tam--;
+    char *p = destino;
+    int i=0;
+
+    while(cantCad-- > 0){
+        //printf("%s\n",cadenas[i].cad);
+        size_t len = strlen(cadenas[i].cad);
+        //printf("%ld\n",len);
+        if(len>=tam){
+            len = tam;
+        }
+        tam-=len;
+        memcpy(p,cadenas[i].cad,len);
+        cadenas++;
+        p+=len;
+    }
+
+    *p = '\0';
+
+    return destino;
+}
+
 void generaCadHufman(char* cH, uc* lectura,Cadena *diccionario, ll tam){
     ll i;
 
