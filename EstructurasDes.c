@@ -90,39 +90,79 @@ void construyeArbol(char* dirDiccionario, NODO raiz){
 
 }
 
-char* generaCad(char * dirCompresion){
+uc * generaCad(char * dirCompresion){
     FILE *archComprimido;
     uc* lectura;
     ll tam = tamArch(dirCompresion);
-
+    lectura = crearCarac(tam);
     archComprimido = fopen(dirCompresion,"rb");
     fread(lectura,tam,1,archComprimido);
 
-    printf("%lld",tam);
+    //printf("%lld",tam);
 
 
     fclose(archComprimido);
-    return "nc";
+    return lectura;
 }
 
 void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
-    char c = 0;
+    char c = 0, *cadenaBytes, auxElem[1];
+    int i, j, val[8] = {128, 64, 32, 16, 8, 4, 2, 1}, bytes, pos, esCeros, noCeros;
     FILE *archComprimido;
     FILE *archDescomprimido;
     NODO aux = arbol;
+    uc *caracteres;
+    long long int tamBytes;
 
-    archComprimido = fopen(dirCompresion,"r");
+    caracteres = generaCad(dirCompresion);
+    tamBytes = tamArch(dirCompresion);
+
+    auxElem[0] = caracteres[tamBytes - 2];
+    noCeros = atoi(auxElem);
+    auxElem[0] = caracteres[tamBytes - 1];
+    esCeros = atoi(auxElem);
+
+    cadenaBytes = crearBin((tamBytes - 2) * 8);
+    
+    for (i = 0; i < tamBytes - 2; i++){
+      bytes = (int)caracteres[i];
+      if(i == (tamBytes - 3) && esCeros == 1){
+          for (j = 0; j < (8 - noCeros); j++){
+            pos = (i * 8) + j;
+            if((bytes - val[j + noCeros]) >= 0){
+              bytes -= val[j + noCeros];
+              cadenaBytes[pos] ='1';
+            }else{
+              cadenaBytes[pos] = '0';
+            }
+          }
+      }else{
+        for (j = 0; j < 8; j++){
+            pos = (i * 8) + j;
+            if((bytes - val[j]) >= 0){
+              bytes -= val[j];
+              cadenaBytes[pos] ='1';
+            }else{
+              cadenaBytes[pos] = '0';
+            }
+        }
+      }
+    }
+
+    for (i = 0; i < ((tamBytes-2) * 8) - noCeros; i++){
+        printf("%c", cadenaBytes[i]);
+    }
+    //archComprimido = fopen(dirCompresion,"r");
     archDescomprimido = fopen(dirDescompresion,"w");
 
-    if(archComprimido == NULL || archDescomprimido == NULL){
+    if(archDescomprimido == NULL){
+    //if(archComprimido == NULL || archDescomprimido == NULL){
         printf("No se han podido abrir los archivo\n");
         return;
     }
 
-    while(!feof(archComprimido)){
-        c = getc(archComprimido);
-        if(c==EOF)
-            break;
+    for (i = 0; i < ((tamBytes-2) * 8) - noCeros; i++){
+        c = cadenaBytes[i];
         if(c=='0')
             aux = aux->izq;
         else if(c=='1')
@@ -138,7 +178,25 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
         }
     }
 
-    fclose(archComprimido);
     fclose(archDescomprimido);
 }
 
+unsigned char * crearCarac(int n){
+  unsigned char *nvo;
+  nvo = (unsigned char *)malloc(sizeof(unsigned char) * n);
+  if(nvo == NULL){
+    printf("No hay espacio en memoria");
+    exit(0);
+  }
+  return nvo;
+}
+
+char * crearBin(long long int n){
+    char * nvo;
+    nvo = (char *) malloc(sizeof(char)*n);
+    if(nvo == NULL){ 
+      printf ("No hay espacio en memoria");
+      exit(0);
+    }
+    return nvo;
+}

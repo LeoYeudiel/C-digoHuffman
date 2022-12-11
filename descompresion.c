@@ -5,15 +5,13 @@
 
 int main(){
     char diccionario[] = "salidas/frecuencias.txt";
-    char dirCompresion[] = "salidas/temp.txt";
-    char dirDescompresion[] = "salidas/descompresion.txt";
+    char dirCompresion[] = "salidas/compresion.dat";
+    char dirDescompresion[] = "salidas/descompresion.mp3";
     char* cadComp;
+    uc *caracteres;
+    long long int tamBytes;
 
     NODO arbol = creaNodo();
     construyeArbol(diccionario,arbol);
-
-
-    printf("%s\n",generaCad(dirDescompresion));
-    descompresion(dirCompresion,dirDescompresion,arbol);
-
+    descompresion(dirCompresion, dirDescompresion, arbol);
 }
