@@ -12,6 +12,8 @@ int main(){
     NODO arbol = creaNodo();
     construyeArbol(diccionario,arbol);
 
+
+    printf("%s\n",generaCad(dirDescompresion));
     descompresion(dirCompresion,dirDescompresion,arbol);
 
 }

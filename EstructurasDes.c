@@ -3,6 +3,41 @@
 #include <stdlib.h>
 #include "EstructurasDes.h"
 
+/*
+  Función que saca el tamaño del archivo
+	--------------------------------------
+	Argumentos:
+	char *arch: contiene la ruta del archivo a analizar 
+	Variables utilizadas:
+	FILE *archivo: tipo de dato para abrir el archivo y extraer la información
+  *return* ll res: devuelve la posición del puntero del archivo (tamaño del archivo)
+*/
+ll tamArch(char* arch){
+    //Abrimos el archivo en modo lectura
+    FILE* archivo = fopen(arch,"r");
+
+    if(archivo==NULL){
+        printf("No se pudo abrir el archivo\n");
+        return -1;
+    }
+
+    /*Recorre el puntero de lectura del archivo de inicio a fin
+    Agrumentos:
+    - archivo: archivo de análisis
+    - inicio de la posición
+    - SEEK_END constante para señalar el final del archivo
+    */
+    fseek(archivo,0L,SEEK_END);
+    //Devuelve la posición en la que se encuentra el archivo, que será el tamaño del contenido del archivo
+    ll res = ftell(archivo);
+    //Cerramos el archivo
+    fclose(archivo);
+
+    return res;
+}
+
+
+
 NODO creaNodo(){
     NODO aux = (NODO)malloc(sizeof(Nodo));
     if(aux == NULL){
@@ -55,6 +90,21 @@ void construyeArbol(char* dirDiccionario, NODO raiz){
 
 }
 
+char* generaCad(char * dirCompresion){
+    FILE *archComprimido;
+    uc* lectura;
+    ll tam = tamArch(dirCompresion);
+
+    archComprimido = fopen(dirCompresion,"rb");
+    fread(lectura,tam,1,archComprimido);
+
+    printf("%lld",tam);
+
+
+    fclose(archComprimido);
+    return "nc";
+}
+
 void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
     char c = 0;
     FILE *archComprimido;
@@ -92,17 +142,3 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
     fclose(archDescomprimido);
 }
 
-ll tamArch(char* arch){
-    FILE* archivo = fopen(arch,"r");
-
-    if(archivo==NULL){
-        printf("No se pudo abrir el archivo\n");
-        return -1;
-    }
-
-    fseek(archivo,0L,SEEK_END);
-    ll res = ftell(archivo);
-    fclose(archivo);
-
-    return res;
-}

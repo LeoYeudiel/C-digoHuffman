@@ -21,5 +21,6 @@ NODO creaNodo();
 void construyeArbol(char* dirDiccionario, NODO raiz);
 void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol);
 ll tamArch(char* arch);
+char* generaCad(char * dirCompresion);
 //char *cadCompresion eliminarBitBasura(char* dirCompresion);
 //void descompresion(char* cadCompresion, char* dirSalida, char* extension,NODO n);

@@ -606,55 +606,77 @@ int convertorBinToDec(char byte[8]){
     return resul;
 }
 
+uc * crearCarac(int n){
+  unsigned char *nvo;
+  nvo = (unsigned char *)malloc(sizeof(unsigned char) * n);
+  if(nvo == NULL){
+    printf("No hay espacio en memoria");
+    exit(0);
+  }
+  return nvo;
+}
+
 void archComp(char* bytes, char* ubicacion){
     
     byte *cadenas, recolectar;
     char nvaCadena[8] = "";
     ll cantBytes, i, cantCero;
     int *dec;
+    uc *carac;
 
     FILE *arch = fopen(ubicacion,"w");
     if(arch == NULL){
       printf("No se pudo abrir el archivo de compresion!\n");   
       exit(1);             
     } 
-
-    //Saca el número de bytes que hay en la cadena
-    cantBytes = (strlen(bytes)/8)+1;
     
-    cadenas = crearEstructura (cantBytes + 1);
-    dec = crearDeci(cantBytes + 1);
+    //Saca el número de bytes que hay en la cadena + 1 para el que no esta completo (si es el caso)
+    cantBytes = (strlen(bytes)/8)+1;
 
+    //Lss dos extras es para almacenar el número de ceros y para verificar si lo hizo o no respectivamente
+    cadenas = crearEstructura (cantBytes + 2);
+    dec = crearDeci(cantBytes + 2);
+    carac = crearCarac(cantBytes + 2);
     //Va insertando los caracteres
     for(i = 0; i < cantBytes; i++){
         strncpy(nvaCadena, bytes + (i*8), 8);
         strcpy(cadenas[i].bits, nvaCadena);
     }
 
-    if(strlen(cadenas[cantBytes-1].bits) < 8){
-        cantCero = 8 - strlen(cadenas[cantBytes - 1].bits);
-        memset(nvaCadena, 0, 8);
-        strcat(nvaCadena, cadenas[cantBytes - 1].bits);
-        for(i = 8- cantCero ; i < 8; i++){
-        strcat(nvaCadena, "0");
-        }
-        strcpy(cadenas[cantBytes - 1].bits, nvaCadena);
-
-        sprintf(cadenas[cantBytes].bits, "%lld" ,cantCero);
+    //Sacamos la cantidad de ceros para llenar el último byte extra
+    cantCero = 8 - strlen(cadenas[cantBytes - 1].bits);
+    memset(nvaCadena, 0, 8);
+    strcat(nvaCadena, cadenas[cantBytes - 1].bits);
+    //Llenamos de ceros los que faltan
+    for(i = 8 - cantCero ; i < 8; i++){
+      strcat(nvaCadena, "0");
     }
+    strcpy(cadenas[cantBytes - 1].bits, nvaCadena);
+    sprintf(cadenas[cantBytes].bits, "%lld" ,cantCero);
+    
+    //Verifica si el último byte fue requerido o no
+    if(cantCero == 8) strcpy(cadenas[cantBytes + 1].bits, "0");
+    else strcpy(cadenas[cantBytes + 1].bits, "1");
     
     //Va insertando los caracteres
-    for(i = 0; i <= cantBytes; i++){
-        if(i < cantBytes){
-            dec[i] = convertorBinToDec(cadenas[i].bits);
-        }else{
-            dec[i] = cantCero;
-        }
-
-        fprintf(arch,"%c",dec[i]);
+    for(i = 0; i <= cantBytes -1; i++){
+      if(i < cantBytes){
+          dec[i] = convertorBinToDec(cadenas[i].bits);
+          carac[i] = (unsigned char)dec[i];
+      }else if(i == cantBytes){
+          dec[i] = cantCero;
+          carac[i] = (unsigned char)dec[i];
+      }else{
+          dec[i] = atoi(cadenas[i].bits);
+          carac[i] = (unsigned char)dec[i];
+      }
+        if(i < cantBytes) {
+          fprintf(arch,"%c", carac[i]);
+        } 
     }
+    
+    fprintf (arch,"%c", cadenas[cantBytes].bits[0]);
+    fprintf (arch,"%c", cadenas[cantBytes -1].bits[0]);
 
     fclose(arch);
 }
-
-   
