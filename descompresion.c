@@ -37,7 +37,7 @@ int main(int argc, char * argv[]){
     //Si no se introducen exactamente 2 argumentos (Cadena de ejecución y formato)
     if (argc!=2) 
     {
-      printf("\nIndique el formato del archivo - Ejemplo: [user@equipo]$ %s archLec/hola.txt\n",argv[0]);
+      printf("\nIndique el formato del archivo - Ejemplo: [user@equipo]$ %s [png|jpg|etc]\n",argv[0]);
       exit(1);
     }
 

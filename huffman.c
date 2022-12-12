@@ -27,9 +27,8 @@ int main(int argc, char * argv[]){
     //Variables del main
     //******************************************************************
     double utime0, stime0, wtime0,utime1, stime1, wtime1; //Variables para medición de tiempos
-    //char nombre[] = "archLec/objetivo.png";
-    char compresion[] = "salidas/compresion.dat"; //Variable del nombre del archivo para poder guardar el archivo comprimido
-    char docFrecuencias[] = "salidas/frecuencias.txt";
+    char compresion[] = "salidas/compresion.dat"; //Variable de la ruta y nombre del archivo para poder guardar el archivo comprimido
+    char docFrecuencias[] = "salidas/frecuencias.txt"; //Variable de la ruta y nombre del archivo para poder guardar nuestro diccionario
     ll tamArchivo;
     uc* lectura;
     Par tablaFrecuencias[256];
@@ -69,20 +68,15 @@ int main(int argc, char * argv[]){
     //Pasamos sólo los elementos verificados a nuestra nueva estructura
     tablaConUtiles(tablaFrecuencias,tablaUtiles,n);
     
-    //imprimeTablaFrecuencias(tablaFrecuencias,256);
-    //imprimeTablaFrecuencias(tablaUtiles,n);
-
+    //Generamos nuestro archivo de tabla de frecuencias
     generaDiccionario(tablaUtiles,n,diccionarioHuffman,&longMaxima, docFrecuencias);
     printf("\n");
-    cadenaHufman = (char*)malloc(sizeof(char)*longMaxima*tamArchivo);
-    //generaCadHufman(cadenaHufman,lectura,diccionarioHuffman,tamArchivo);
-    concatena(cadenaHufman,longMaxima*tamArchivo,lectura,diccionarioHuffman,tamArchivo);
 
-    /*
-    for(int i=0; i<256; i++){
-        printf("%d\t%s\n",i,diccionarioHuffman[i].cad);
-    }*/
+    //Asignamos memoria para generar la cadena para la compresión (cadena que contendrá todos los bits)
+    cadenaHufman = (char*)malloc(sizeof(char)*longMaxima*tamArchivo);
+    concatena(cadenaHufman,longMaxima*tamArchivo,lectura,diccionarioHuffman,tamArchivo);
     
+    //Función que crea el archivo comprimido
     archComp(cadenaHufman,compresion);
 
     //******************************************************************	
@@ -99,3 +93,4 @@ int main(int argc, char * argv[]){
 
     return 0;
 }
+ 

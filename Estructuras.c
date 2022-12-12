@@ -16,13 +16,29 @@
 #include <string.h>
 #include <assert.h>
 
-
+/*
+  Imprime el valor de un elemento:
+  --------------------------------
+  Argumentos:
+  Par p: contiene la infomración del elemento extraído del arreglo
+*/
 void imprimePar(Par p){
     printf("%d %lld\n",p.valor, p.repeticiones);
 }
 
+/*
+  Describe la navegación en el arbol
+  ----------------------------------
+  Argumentos:
+  int a[]: navegación almacenada
+  int n: longitud que lleva
+  FILE *arch: archivo de escritura
+  Variables a utilizar:
+  int i: utilizada para los loops 
+*/
 void imprimeArregloEnteros(int a[], int n, FILE *arch){
     int i;
+    //Va recorriendo todo el número de bits que está pasando el árbol
     for(i=0; i<n; i++){
         if(arch == NULL) printf("%d",a[i]);
         else fprintf(arch,"%d",a[i]);
@@ -258,7 +274,18 @@ void tablaConUtiles(Pares tablaFrecuencias, Pares nuevaTabla, int n){
     }
 }
 
-
+/*
+  Imprime la tabla de frecuencias (prueba)
+  ----------------------------------------
+  Argumentos:
+  Pares tablaFrecuencias: contenido sacada del archivo a comprimir
+  int n: número de elementos
+  Variables a utilizar:
+  int i: utilizada para los loops
+  int valorTF: valor decimal del elemento
+  int n_bits: número de bits
+  uc num: valor en unsigned char del elemento
+*/
 void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n){
     int i,valorTF,n_bits;
     uc num;
@@ -280,9 +307,20 @@ void imprimeTablaFrecuencias(Pares tablaFrecuencias, int n){
     }
 }
 
+/*
+  Imprime los bits del elemento encontrado
+  ----------------------------------------
+  Argumentos:
+  int n_bits: escritura de 8 elementos
+  uc: elementos a escribir en bits
+  FILE *arch: archivo a la que se le va a hacer la escritura
+  Variables a utilizar:
+  int i: utilizada para los loops
+*/
 void imprimeBits(int n_bits, uc numero, FILE *arch){
     int i;
 
+    //Va consultando bit por bit y lo va escribiendo
     for (i=n_bits-1; i>=0; i--)
     	if(arch == NULL) printf("%d",CONSULTARBIT(numero,i));
     	else fprintf(arch ,"%d",CONSULTARBIT(numero,i));
@@ -342,17 +380,35 @@ ARBOL creaArbol(int capacidad){
     return aux;
 }
 
+/*
+	Función que realiza intercambio de nodos
+	----------------------------------------
+	Argumentos:
+	NODO *a: primer nodo a intercambiar
+  NODO *b: segundo nodo a intercambiar
+	Variables utilizadas:
+	NODO aux: variable auxiliar para no perder su valor
+*/
 void intercambioNodos(NODO* a, NODO* b){
     NODO aux = *a;
     *a = *b;
     *b = aux;
 }
 
+/*
+  Algoritmo recursivo para reubicar un nodo
+  -----------------------------------------
+  Argumentos:
+  ARBOL a: estructura árbol que contiene nuestra información de los elementos
+  int indice: posición de nuestro nodo
+*/
 void intercambioActualMin(ARBOL a, int indice){
+  //Inicializamos variables (la posición de nuestro nodo izquierdo y derecho)
     int min = indice;
     int izq = 2*indice+1;
     int derecha = 2*indice+2;
 
+    //En caso de que haya un valor menor en uno de sus nodos hijos se le asigna como el mínimo
     if( izq < a->tam && 
         a->nodos[izq]->info.repeticiones < a->nodos[min]->info.repeticiones){
         min = izq;
@@ -362,30 +418,58 @@ void intercambioActualMin(ARBOL a, int indice){
         min = derecha;
     }
 
+    //Mientras haya cambiado el mínimo se hace el intercambio y se repite el proceso
     if(min!=indice){
         intercambioNodos(&a->nodos[min],&a->nodos[indice]);
         intercambioActualMin(a,min);
     }
 }
 
+/*
+  Verifica que aún haya nodos a analizar
+  --------------------------------------
+  Argumentos:
+  ARBOL a: estructura padre que contiene toda la información de los elementos del archivo
+  Variables a utilizar
+  *return* valor booleano para corroborar si todavía se tiene que manipular el ARBOL o sí ya está en su estado final
+*/
 int esTam1(ARBOL a){
     return (a->tam==1);
 }
 
+/*
+  Función que extraé el nodo raíz del Heap de Mínimos
+  ---------------------------------------------------
+  Argumentos:
+  ARBOL a: estructura arbol que contiene nuestra información de los elementos
+  Variables a utilizar:
+  *return* NODO aux: será el mínimo extraído del heap de mínimos
+*/
 NODO extraeMin(ARBOL a){
     NODO aux = a->nodos[0];
     a->nodos[0] = a->nodos[a->tam-1];
 
+    //Vuelve a reacomodar el HEAP de mínimos
     --a->tam;
     intercambioActualMin(a,0);
 
     return aux;
 }
 
+/*
+  Función que inserta un NODO en el heap de mínimos
+  -------------------------------------------------
+  Argumentos:
+  ARBOL a: estructura padre que contiene toda la información
+  NODO n: NODO que queremos insertar
+  Variables utilizadas:
+  int i: variable utilizada para el loop
+*/
 void inserta(ARBOL ar, NODO n){
     ++ar->tam;
     int i = ar->tam-1;
 
+    //Acomodamos el valor en el HEAP de mínimos
     while(i && n->info.repeticiones < ar->nodos[(i-1)/2]->info.repeticiones){
         ar->nodos[i] = ar->nodos[(i-1)/2];
         i=(i-1)/2;
@@ -394,6 +478,12 @@ void inserta(ARBOL ar, NODO n){
     ar->nodos[i] = n;
 }
 
+/*
+  Construye un Heap de Mínimos inicial
+  ------------------------------------
+  Argumentos:
+  ARBOL a: estructura que contiene la información a organizar
+*/
 void construye(ARBOL a){
     int n = a->tam - 1;
     int i;
@@ -404,6 +494,13 @@ void construye(ARBOL a){
         
 }
 
+/*
+  Verifica si es un elemento como tal
+  -----------------------------------
+  Argumentos: 
+  NODO raiz: estructura que contiene información a verificar
+  return valor booleano si hay existencia de otros elementos
+*/
 int esHoja(NODO raiz){
     return !(raiz->izquierdo) && !(raiz->derecho);
 }
@@ -427,13 +524,23 @@ ARBOL construyeArbolRep(Pares datos, int n){
     }
     
     ar->tam = n;
+    //Organiza como un Heap de mínimos
     construye(ar);
 
     return ar;
 }
 
 /*
-
+  Crea el árbol de huffman, organizandolo conforme al número de repeticiones
+  --------------------------------------------------------------------------
+  Argumentos:
+  Pares datos: estructura que contiene la información extraída del archivo
+  int n: referencia el tamaño de elementos encontrados en el archivo
+  Variables utilizadas:
+  NODO izq; variable auxiliar para referenciar el primer elemento mínimo
+  NODO der: variable auxiliar para referenciar el segundo elemento mínimo
+  NODO superior: variable que será la intersección de los dos anteriores
+  ARBOL a: estructura padre que contiene toda la información de los elementos del archivo
 */
 NODO construyeArbolHuffman(Pares datos, int n){
     NODO izq;
@@ -443,66 +550,104 @@ NODO construyeArbolHuffman(Pares datos, int n){
     ARBOL a = construyeArbolRep(datos,n);
 
     while(!esTam1(a)){
+      //Extrae los dos mínimos
         izq = extraeMin(a);
         der = extraeMin(a);
 
+      //Sera nuestra información intermedia que contendrá el número de repeticiones de los dos números analizados
         Par p;
         p.valor = 36;
         p.repeticiones = izq->info.repeticiones + der->info.repeticiones;
+
+      //Lo meto dentro de una estructura NODO
         superior = nuevoNodo(p);
 
+      //Asignamos la parte derecha y la parte izquierda
         superior->izquierdo = izq;
         superior->derecho = der;
 
+      //Lo insertamos en el heap
         inserta(a,superior);
     }
 
+    //Devolvemos el NODO que contiene todo el arbol de HUFFMAN
     return extraeMin(a);
 }
 
+/*
+  Algoritmo recursivo para generar nuestro archivo "tabla de frecuencias"
+  -----------------------------------------------------------------------
+  Argumentos:
+  NODO raiz: estructura nodo que contiene la información a manipular
+  int *a: seguimiento en bits sobre el árbol
+  int tope: el número de bits que se ha llegado dentro del árbol
+  Cadena *dic: variable de almacenar información de la navegación de bits
+  int *max: es el número de longitud máxima que se logra formar en el árbol
+  FILE *nombreArch: archivo a la que se está escribiendo los datos
+*/
 void imprimeCodigos(NODO raiz, int *a, int tope, Cadena *dic, int *max, FILE *nombreArch){
+  //Asigna la longitud máxima de bits formado si se llega a cumplir
     if(tope>(*max))    *max = tope;
 
+  //En el camino del lado izquierdo se le asigna un cero y va haciendo recursividad en ese camino
     if(raiz->izquierdo){
         a[tope] = 0;
         imprimeCodigos(raiz->izquierdo, a, tope+1,dic,max, nombreArch);
     }
 
+  //En el camino del lado derecho se le asigna un uno y va haciendo recursividad en ese camino
     if(raiz->derecho){
         a[tope] = 1;
         imprimeCodigos(raiz->derecho, a, tope+1,dic,max, nombreArch);
     }
 
+  //En caso de que sea elemento escribe la información
     if(esHoja(raiz)){
+      //Escribe el número de repeticiones
         fprintf(nombreArch,"%lld\t", raiz->info.repeticiones);
+      //Escribe el byte formado
         imprimeBits(8,raiz->info.valor, nombreArch);
         fprintf(nombreArch,"\t");
+        //Escribe el valor en decimal
         fprintf(nombreArch, "%d\t", raiz->info.valor);
+        //Escribe la navegación del arbol
         imprimeArregloEnteros(a,tope, nombreArch);
+        //Función de copia de la información de la navegación de bits
         arrToString(a,dic[raiz->info.valor].cad,tope);
     }
 }
 
 /*
-
-  -----------------------------------------------------------
+  Saca como resultante un archivo con nuestro diccionario "Tabla de Frecuencias"
+  ------------------------------------------------------------------------------
   Argumentos:
   Pares datos: estructura que contiene la información extraída del archivo
   int n: referencia el tamaño de elementos encontrados en el archivo
   Cadena *dic:
   Variables utilizadas:
-  *return* int res: devuelve la variable que guarda la cantidad de bytes identificados en el archivo
-  int i: utilizada para el loop
+  int a[100]
 */
 void generaDiccionario(Pares datos, int n, Cadena *dic, int *max, char *nombreArch){
-
+    //Obtenemos el arbol de Huufman
     NODO raiz = construyeArbolHuffman(datos,n);
     int a[100], tope = 0;
     FILE *arch = fopen(nombreArch, "w");
+    //Generamos nuestro archivo de tabla de frecuencias
     imprimeCodigos(raiz,a,tope,dic,max, arch);
     fclose(arch);
 }
 
+/*
+  Función de hacer guardar información de la navegación del elemento
+  ------------------------
+  Argumentos: 
+  int *arr: arreglo sobre la navegación sobre el arbol
+  char *s: cadena donde tiene la información del elementos
+  int n: el número de elementos
+  Variables utilizadas:
+  int i: utilizada para los loops
+  int inidice: valor indexado del elementos
+*/
 void arrToString(int *arr, char* s, int n){
     int i=0;
     int indice = 0;
@@ -514,33 +659,18 @@ void arrToString(int *arr, char* s, int n){
 }
 
 /*
-char* concatena(char *destino, size_t tam, Cadena* cadenas, size_t cantCad){
-    assert(tam>0);
-    
-    tam--;
-    char *p = destino;
-    int i=0;
-
-    while(cantCad-- > 0){
-        //printf("%s\n",cadenas[i].cad);
-        size_t len = strlen(cadenas[i].cad);
-        //printf("%ld\n",len);
-        if(len>=tam){
-            len = tam;
-        }
-        tam-=len;
-        memcpy(p,cadenas[i].cad,len);
-        cadenas++;
-        p+=len;
-    }
-
-    *p = '\0';
-
-    return destino;
-}
+  Recolecta la información de nuestra tabla de frecuencias
+  --------------------------------------------------------
+  Argumentos: 
+  char * destino: cadena a la que se va a concatenar
+  size_t tam: longitud a la que se va a manipular
+  uc * contiene el contenido/elementos del archivo
+  Cadena *diccionario: contiene la navegación de nuestros elementos
+  size_t cantCad: tamaño de elementos de manipulación
 */
-
 void concatena(char *destino, size_t tam, uc* lectura, Cadena* diccionario, size_t cantCad){
+
+  //Realiza diagnostico sobre si hay error en la manipulación de la expresión, aborta el programa en caso de que lo haya
     assert(tam>0);
     
     tam--;
@@ -548,10 +678,9 @@ void concatena(char *destino, size_t tam, uc* lectura, Cadena* diccionario, size
     int i=0;
 
 
+    //Obtienen el contenido de nuestra información guardada anteriormente
     while(cantCad-- > 0){
         size_t len = strlen(diccionario[lectura[i]].cad);
-        //printf("%s\n",diccionario[lectura[i]].cad);
-        //printf("El tam es: %ld\n",len);
         if(len>=tam){
             len = tam;
         }
@@ -561,23 +690,24 @@ void concatena(char *destino, size_t tam, uc* lectura, Cadena* diccionario, size
         p+=len;
     }
 
+
     *p = '\0';
 }
 
 void generaCadHufman(char* cH, uc* lectura,Cadena *diccionario, ll tam){
     ll i;
-
-    //printf("%ld",sizeof(cH)/sizeof(cH[0]));
     
     concatena(cH,sizeof cH, lectura,diccionario,tam);
-    
-    /*
-    for(i=0; i<tam; i++){
-        printf("%s\n",diccionario[lectura[i]].cad);
-        strcat(cH,diccionario[lectura[i]].cad);
-    }*/
 }
 
+/*
+  Función que asigna memoria a un arreglo tipo "byte"
+	---------------------------------------------------
+	Argumentos:
+	int n: contiene el tamaño que se requiere
+	Variables utilizadas:
+	*return* byte *nvo: puntero que se devuelve con la memoria asignada
+*/
 byte * crearEstructura(int n){
   byte * nvo;
   nvo = (byte *) malloc(sizeof(byte)*n);
@@ -588,6 +718,14 @@ byte * crearEstructura(int n){
   return nvo;
 }
 
+/*
+  Función que asigna memoria a un arreglo tipo "int"
+	------------------------------------------------------------
+	Argumentos:
+	int n: contiene el tamaño que se requiere
+	Variables utilizadas:
+	*return* unsigned char *nvo: puntero que se devuelve con la memoria asignada
+*/
 int * crearDeci(int n){
   int * nvo;
   nvo = (int *) malloc(sizeof(int)*n);
@@ -598,6 +736,16 @@ int * crearDeci(int n){
   return nvo;
 }
 
+/*
+  Convierte nuestra cadena de bits en Decimal
+  -------------------------------------------
+  Argumentos:
+  char byte[8]: contiene la información de un byte (8 bits)
+  Variables utilizadas:
+  int val[8]: arreglo que contiene el valor número en una posición de byte
+  int i: utilizada para los loop
+  *return* int resul: número en decimal equivalente
+*/
 int convertorBinToDec(char byte[8]){
     int val[8] = {128,64,32,16,8,4,2,1}, i, resul=0;
     for(i = 0; i < 8; i++){
@@ -606,6 +754,14 @@ int convertorBinToDec(char byte[8]){
     return resul;
 }
 
+/*
+  Función que asigna memoria a un arreglo tipo "unsigned char"
+	------------------------------------------------------------
+	Argumentos:
+	int n: contiene el tamaño que se requiere
+	Variables utilizadas:
+	*return* unsigned char *nvo: puntero que se devuelve con la memoria asignada
+*/
 uc * crearCarac(int n){
   unsigned char *nvo;
   nvo = (unsigned char *)malloc(sizeof(unsigned char) * n);
@@ -616,6 +772,21 @@ uc * crearCarac(int n){
   return nvo;
 }
 
+/*
+  Función que crea el archivo comprimido
+  --------------------------------------
+  Argumentos:
+  char *bytes: contiene la cadena de Huffman (cadena con todos los bits encontrados)
+  char *ubicacion: ruta y nombre del archivo en donde se va a guardar el archivo comprimiso
+  Variables utilizada:
+  byte *cadenas: estructura que guarda bytes (8bits)
+  char nvaCadena[8]: auxiliar para la manipulación de la cadena de bits
+  ll cantBytes: cantidad de Bytes que hay que manipular
+  ll i: utilizadas para los loops
+  ll cantCero: caso para la manipulación del último byte
+  int *dec: arreglo que contiene el hexadecimal del byte
+  uc * carac: arreglo que contiene el elemento del byte
+*/
 void archComp(char* bytes, char* ubicacion){
     
     byte *cadenas, recolectar;
@@ -624,6 +795,7 @@ void archComp(char* bytes, char* ubicacion){
     int *dec;
     uc *carac;
 
+    //Abrimos el archivo en modo escritura
     FILE *arch = fopen(ubicacion,"w");
     if(arch == NULL){
       printf("No se pudo abrir el archivo de compresion!\n");   
@@ -675,6 +847,7 @@ void archComp(char* bytes, char* ubicacion){
         } 
     }
     
+    //Inserta los dos últimos elementos para manipular el último bute
     fprintf (arch,"%c", cadenas[cantBytes].bits[0]);
     fprintf (arch,"%c", cadenas[cantBytes -1].bits[0]);
 
