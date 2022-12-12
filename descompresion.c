@@ -51,8 +51,9 @@ int main(int argc, char * argv[]){
 
     //Creamos la estructura que contendrá la información de la tabla de frecuencias    
     NODO arbol = creaNodo();
-    
+    //Construimos el árbol conforme a la tabla de frecuencias
     construyeArbol(diccionario,arbol);
+    //Directamente descomprime y crea el archivo resultante
     descompresion(dirCompresion, dirDescompresion, arbol);
 
     //******************************************************************	

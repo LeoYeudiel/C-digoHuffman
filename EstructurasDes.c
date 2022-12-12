@@ -118,32 +118,65 @@ void construyeArbol(char* dirDiccionario, NODO raiz){
                 n=n->der;
             }
         }
-        //Terminando el recorrimiento, se queda en un nodo del cual se le asigna un valor booleano donde dice que 
+        //Terminando el recorrimiento, se queda en un nodo del cual se le asigna un valor booleano donde dice que si se encontró el valor y se le pone el elemento que es en hexadecimal
         n->esHoja =1;
         n->simbolo=valor;
     }
 
 }
 
+/*
+  Función que obtiene la información del archivo comprimido
+	---------------------------------------------------------
+	Argumentos:
+	char *dirCompresion: contiene la ruta y el nombre del archivo comprimido
+	Variables utilizadas:
+	- FILE *archComprimido: tipo de dato para abrir el archivo y extraer la información
+  *return* uc *lectura: el arreglo de carácteres que va a obtener del archivo
+  ll tam: variable para guardar el tamaño de elementos que contiene el archivo
+*/
 uc * generaCad(char * dirCompresion){
     FILE *archComprimido;
     uc* lectura;
     ll tam = tamArch(dirCompresion);
     lectura = crearCarac(tam);
+
+    //Abrimos el archivo en modo lectura binaria
     archComprimido = fopen(dirCompresion,"rb");
+
+    //Leemos todo el archivo almacenando uno por uno
     fread(lectura,tam,1,archComprimido);
-
-    //printf("%lld",tam);
-
 
     fclose(archComprimido);
     return lectura;
 }
 
+/*
+  Función que descomprime (escribe el archivo resultante)
+  -------------------------------------------------------
+  Argumentos:
+  char *dirCompresion: contiene la ruta y el nombre del archivo comprimido
+  cahr *dirDescompresion: contiene la ruta y el nombre del archivo resultante
+  NODO arbol:  arbol que contiene la información de nuestro diccionario
+  Variables utilizadas:
+  char c: variable auxiliar para analizar cada caracter bit en bit
+  char *cadenaBytes: puntero para guardar todos los bits de nuestro archivo
+  char auxElem[1]: arreglo auxiliar para conversión de uc a int
+  int i: utilizada para loops
+  int j: utilizada para loops
+  int val[8]: arreglo que contiene el valor número en una posición de byte
+  int bytes: variable auxiliar para el análisis de cada caracter en hexadecimal
+  int pos: variable auxiliar para saber la posición de escritura en el armado del arreglo de bits
+  int esCeros: valor booleano que verifica si se añade o no ceros
+  int noCeros: contiene le número de ceros basura del último byte
+  FILE *archDescomprimido: tipo de dato de escritura de nuestro archivo resultante
+  NODO aux: estructura para referencias nuestra raíz del árbol e ir navegando sobre el
+  uc *caracteres: contiene el arreglo de caráctes en hexadecimal del documento
+  long long int tamBytes: contiene el tamaño de elementos a analizar del archivo
+*/
 void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
     char c = 0, *cadenaBytes, auxElem[1];
     int i, j, val[8] = {128, 64, 32, 16, 8, 4, 2, 1}, bytes, pos, esCeros, noCeros;
-    FILE *archComprimido;
     FILE *archDescomprimido;
     NODO aux = arbol;
     uc *caracteres;
@@ -152,18 +185,26 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
     caracteres = generaCad(dirCompresion);
     tamBytes = tamArch(dirCompresion);
 
+    //Sacamos los dos últimos valores que contiene información sobre la manipulación del último byte
     auxElem[0] = caracteres[tamBytes - 2];
     noCeros = atoi(auxElem);
     auxElem[0] = caracteres[tamBytes - 1];
     esCeros = atoi(auxElem);
 
+    //Asignamos memoria para guardar todos los bits de los caracteres
     cadenaBytes = crearBin((tamBytes - 2) * 8);
     
+    //Recorremos todos los bytes de nuestro archivo
     for (i = 0; i < tamBytes - 2; i++){
       bytes = (int)caracteres[i];
+      //Estes es el caso especial para trata el último byte de nuestro archivo
       if(i == (tamBytes - 3) && esCeros == 1){
+        //Recorre el número de bits que se forma por el último byte
           for (j = 0; j < (8 - noCeros); j++){
+            //Se asigna la posición para asignarlo en nuestra cadena de carácteres
             pos = (i * 8) + j;
+
+            //Si su valor hexadecimal es mayor a cero se va armando nuestra cadena de bits conforme a su posición
             if((bytes - val[j + noCeros]) >= 0){
               bytes -= val[j + noCeros];
               cadenaBytes[pos] ='1';
@@ -172,8 +213,12 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
             }
           }
       }else{
+        //Recorre el número de bits de los que tiene el byte
         for (j = 0; j < 8; j++){
+          //Se asigna la posición para asignarlo en nuestra cadena de carácteres
             pos = (i * 8) + j;
+
+            //Si su valor hexadecimal es mayor a cero se va armando nuestra cadena de bits conforme a su posición
             if((bytes - val[j]) >= 0){
               bytes -= val[j];
               cadenaBytes[pos] ='1';
@@ -184,10 +229,7 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
       }
     }
 
-    /*for (i = 0; i < ((tamBytes-2) * 8) - noCeros; i++){
-        printf("%c", cadenaBytes[i]);
-    }*/
-    //archComprimido = fopen(dirCompresion,"r");
+    //Se abre el archivo en modo escritura
     archDescomprimido = fopen(dirDescompresion,"w");
 
     if(archDescomprimido == NULL){
@@ -196,8 +238,10 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
         return;
     }
 
+    //Se va recorriendo toda nuestra cadena de bits obtenida anteriormente
     for (i = 0; i < ((tamBytes-2) * 8) - noCeros; i++){
         c = cadenaBytes[i];
+        //Va navegando en el árbol
         if(c=='0')
             aux = aux->izq;
         else if(c=='1')
@@ -207,6 +251,7 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
             return;
         }
 
+        //En caso de que haya sido un nodo identificado se escribe el valor hexadecimal y referencia de nuevo al nodo raíz
         if(aux->esHoja){
             fprintf(archDescomprimido,"%c",aux->simbolo);
             aux = arbol;
@@ -216,6 +261,14 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
     fclose(archDescomprimido);
 }
 
+/*
+  Función que asigna memoria a un arreglo tipo "unsigned char"
+	------------------------------------------------------------
+	Argumentos:
+	int n: contiene el tamaño que se requiere
+	Variables utilizadas:
+	*return* unsigned char *nvo: puntero que se devuelve con la memoria asignada
+*/
 unsigned char * crearCarac(int n){
   unsigned char *nvo;
   nvo = (unsigned char *)malloc(sizeof(unsigned char) * n);
@@ -226,6 +279,14 @@ unsigned char * crearCarac(int n){
   return nvo;
 }
 
+/*
+  Función que asigna memoria a un arreglo tipo "char"
+	---------------------------------------------------
+	Argumentos:
+	long long int n: contiene el tamaño que se requiere
+	Variables utilizadas:
+	*return* char *nvo: puntero que se devuelve con la memoria asignada
+*/
 char * crearBin(long long int n){
     char * nvo;
     nvo = (char *) malloc(sizeof(char)*n);
