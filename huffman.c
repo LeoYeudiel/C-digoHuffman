@@ -5,8 +5,8 @@
 //ESCOM-IPN
 //Equipo: LOS TOSTADOS
 //Algoritmo: Codificación voraz de Huffman
-//Compilación: "gcc huffman.c estructuras.c tiempo.x  -o huffman" (tiempo.c si se tiene la implementación de la libreria o tiempo.o si solo se tiene el codigo objeto)
-//Ejecución: "./huffman nombre_archivo" (Linux y MAC OS)
+//Compilación: "gcc huffman.c Estructuras.c tiempo.x  -o huffman" (tiempo.c si se tiene la implementación de la libreria o tiempo.o si solo se tiene el codigo objeto)
+//Ejecución: "./huffman ruta_y_nombre_archivo" (Linux y MAC OS)
 //*****************************************************************
 
 //*****************************************************************
@@ -42,7 +42,7 @@ int main(int argc, char * argv[]){
     //******************************************************************	
     //Recepción y decodificación de argumentos
     //******************************************************************	
-    //Si no se introducen exactamente 2 argumentos (Cadena de ejecución y cadena=nombre)
+    //Si no se introducen exactamente 2 argumentos (Cadena de ejecución y rutaYNombreArchivo)
     if (argc!=2) 
     {
       printf("\nIndique el directorio del algoritmo - Ejemplo: [user@equipo]$ %s archLec/hola.txt\n",argv[0]);

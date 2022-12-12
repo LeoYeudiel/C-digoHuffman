@@ -4,7 +4,7 @@
 //(C) Diciembre 2022
 //ESCOM-IPN
 //Equipo: LOS TOSTADOS
-//Funciones/Operaciones de para la codificación de Huffman
+//Funciones/Operaciones para la codificación de Huffman
 //*****************************************************************
 
 //*****************************************************************

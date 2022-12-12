@@ -1,6 +1,19 @@
+//*****************************************************************
+//M. EN C. EDGARDO ADRIÁN FRANCO MARTÍNEZ 
+//Curso: Análisis y Diseño de Algoritmos
+//(C) Diciembre 2022
+//ESCOM-IPN
+//Equipo: LOS TOSTADOS
+//Funciones/Operaciones para la decodificación de Huffman
+//*****************************************************************
+
+//*****************************************************************
+//LIBRERIAS INCLUIDAS
+//*****************************************************************
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "tiempo.h"
 #include "EstructurasDes.h"
 
 /*
@@ -37,7 +50,12 @@ ll tamArch(char* arch){
 }
 
 
-
+/*
+  Función que crea una estructura NODO
+	--------------------------------------
+	Variables utilizadas:
+	*return* NODO aux: estructura a devolver con memoria reservada
+*/
 NODO creaNodo(){
     NODO aux = (NODO)malloc(sizeof(Nodo));
     if(aux == NULL){
@@ -47,6 +65,15 @@ NODO creaNodo(){
     return aux;
 }
 
+/*
+  Función que saca el tamaño del archivo
+	--------------------------------------
+	Argumentos:
+	char *arch: contiene la ruta del archivo a analizar 
+	Variables utilizadas:
+	FILE *archivo: tipo de dato para abrir el archivo y extraer la información
+  *return* ll res: devuelve la posición del puntero del archivo (tamaño del archivo)
+*/
 void construyeArbol(char* dirDiccionario, NODO raiz){
     FILE* arch;
     int i, longitud =0;
@@ -56,26 +83,34 @@ void construyeArbol(char* dirDiccionario, NODO raiz){
     char valorBinario[8];
     NODO n=NULL;
 
+    //Abrimos nuestro archivo de tabla de frecuencias en modo binario
     arch = fopen(dirDiccionario,"rb");
     if(arch == NULL){
         printf("No se ha podido abrir el diccionario\n");
         return;
     }
 
+    //Leemos todo el archivo
     while(!feof(arch)){
         valor = 0;
 
+        //Obtenemos valores por fila, que contiene el número de repeticiones, su valor en binario, su valor en hexadecimal y la ubicación dentro del árbol
         fscanf(arch, "%lld\t%s\t%d\t%s\n", &repeticiones,valorBinario,&valor,valorDiccionario);
+
+        //Referenciamos nuestro nodo raíz a una variable auxiliar y vemos hasta cuantos niveles debemos de recorrer
         n = raiz;
         longitud = strlen(valorDiccionario);
 
+        //Vamos bajando de nivel conforme al valor que se obtuvo
         for(i=0; i<longitud; i++){
+          //En caso de ser 0, irá navegando por el lado izquierdo, en caso de que no haya nodo, se crea
             if(valorDiccionario[i] == '0'){
                 if(n->izq==NULL){
                     n->izq = creaNodo();
                 }
                 n = n->izq;
             }
+            //En caso de ser 1, irá navegando por el lado derecho, en caso de que no haya nodo, se crea
             else if(valorDiccionario[i] == '1'){
                 if(n->der==NULL){
                     n->der = creaNodo();
@@ -83,7 +118,7 @@ void construyeArbol(char* dirDiccionario, NODO raiz){
                 n=n->der;
             }
         }
-
+        //Terminando el recorrimiento, se queda en un nodo del cual se le asigna un valor booleano donde dice que 
         n->esHoja =1;
         n->simbolo=valor;
     }
@@ -149,9 +184,9 @@ void descompresion(char * dirCompresion, char* dirDescompresion, NODO arbol){
       }
     }
 
-    for (i = 0; i < ((tamBytes-2) * 8) - noCeros; i++){
+    /*for (i = 0; i < ((tamBytes-2) * 8) - noCeros; i++){
         printf("%c", cadenaBytes[i]);
-    }
+    }*/
     //archComprimido = fopen(dirCompresion,"r");
     archDescomprimido = fopen(dirDescompresion,"w");
 
